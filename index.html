@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Touch ID</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome to My Touch ID</h1>
+    </header>
+
+    <main>
+        <section id="add-book-form">
+            <h2>Please Fill This Form Accordingly</h2>
+            
+            <div class="contact-right">
+                <form name="submit-to-google-sheet">
+                    <input type="text" name="Name" placeholder="Your Name" required>
+                    <input type="tel" name="Phone" placeholder="Your Phone" required pattern="^[0-9]{10}$" title="Please enter a valid 10-digit phone number">
+                    <textarea name="Message" rows="6" placeholder="Your Message"></textarea>
+                    
+                        <button type="submit" class="btn btn2">Submit</button>
+                        <button id="nextButton" class="button1" style="display: none; margin-top: 20px;">Next</button>
+                    
+                    
+                    
+                </form>
+                <!-- Next Button hidden initially -->
+                <!-- <button id="nextButton" class="button" style="display: none; margin-top: 20px;">Next</button> -->
+
+                <span id="msg">Hello</span>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Scanner. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Google Sheets script URL for form submission
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzYI_deiWUsZoOadwuiggVz4QyANpqxFzpFlNyWNNEx4TU1f4Bd2VRRl1lQxCEybcA/exec';
+        const form = document.forms['submit-to-google-sheet'];
+        const msg = document.getElementById("msg");
+        const nextButton = document.getElementById("nextButton");
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();  // Prevent the default form submission
+
+            // Submit the form data to Google Sheets
+            fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+                .then(response => {
+                    // Check if the response was OK (status 200)
+                    if (response.ok) {
+                        msg.innerHTML = "Message sent successfully";
+
+                        // Display the "Next" button after successful submission
+                        nextButton.style.display = "block";
+
+                        // Event listener for the "Next" button to redirect to finger.html
+                        nextButton.addEventListener('click', function() {
+                            window.location.href = "finger.html";  // Redirect to finger.html
+                        });
+
+                        setTimeout(function(){
+                            msg.innerHTML = "";
+                        }, 5000);
+
+                        // Reset form
+                        form.reset();
+                    } else {
+                        throw new Error('Form submission failed.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error!', error.message);
+                    msg.innerHTML = "Error sending message. Please try again.";
+                });
+        });
+    </script>
+    <script src="script.js"></script> 
+</body>
+</html>
