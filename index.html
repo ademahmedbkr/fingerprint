@@ -21,9 +21,14 @@
                     <input type="tel" name="Phone" placeholder="Your Phone" required pattern="^[0-9]{10}$" title="Please enter a valid 10-digit phone number">
                     <textarea name="Message" rows="6" placeholder="Your Message"></textarea>
                     
-                    <button type="submit" class="btn btn2">Submit</button>
-                    <button id="nextButton" class="button1" style="display: none; margin-top: 20px;">Next</button>
+                        <button type="submit" class="btn btn2">Submit</button>
+                        <button id="nextButton" class="button1" style="display: none; margin-top: 20px;">Next</button>
+                    
+                    
+                    
                 </form>
+                <!-- Next Button hidden initially -->
+                <!-- <button id="nextButton" class="button" style="display: none; margin-top: 20px;">Next</button> -->
 
                 <span id="msg">Hello</span>
             </div>
@@ -41,39 +46,20 @@
         const msg = document.getElementById("msg");
         const nextButton = document.getElementById("nextButton");
 
-        // Check if the form has expired
-        const expirationTime = 30 * 60 * 1000; // 30 minutes in milliseconds
-        const startTime = sessionStorage.getItem('startTime') || Date.now();
-        sessionStorage.setItem('startTime', startTime);
-
-        function checkExpiration() {
-            const currentTime = Date.now();
-            const elapsedTime = currentTime - startTime;
-            if (elapsedTime >= expirationTime) {
-                msg.innerHTML = "Sorry, this form has expired.";
-                form.querySelectorAll("input, textarea, button").forEach(element => {
-                    element.disabled = true;  // Disable form inputs
-                });
-                setTimeout(() => {
-                    window.location.href = "expired.html";  // Redirect to an expiration notice page after 5 seconds
-                }, 5000);
-            }
-        }
-
-        // Run the expiration check immediately and then every minute
-        checkExpiration();
-        setInterval(checkExpiration, 60000);
-
         form.addEventListener('submit', e => {
             e.preventDefault();  // Prevent the default form submission
 
             // Submit the form data to Google Sheets
             fetch(scriptURL, { method: 'POST', body: new FormData(form) })
                 .then(response => {
+                    // Check if the response was OK (status 200)
                     if (response.ok) {
                         msg.innerHTML = "Message sent successfully";
-                        nextButton.style.display = "block";  // Show the "Next" button
 
+                        // Display the "Next" button after successful submission
+                        nextButton.style.display = "block";
+
+                        // Event listener for the "Next" button to redirect to finger.html
                         nextButton.addEventListener('click', function() {
                             window.location.href = "finger.html";  // Redirect to finger.html
                         });
@@ -82,6 +68,7 @@
                             msg.innerHTML = "";
                         }, 5000);
 
+                        // Reset form
                         form.reset();
                     } else {
                         throw new Error('Form submission failed.');
